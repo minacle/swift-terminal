@@ -1,0 +1,3 @@
+@frozen
+public enum Terminal {
+}
