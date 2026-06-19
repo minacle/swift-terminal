@@ -4,10 +4,10 @@ public import System
 public import SystemPackage
 #endif
 
-#if os(Linux)
-private import Glibc
-#elseif canImport(Darwin)
+#if canImport(Darwin)
 private import Darwin
+#elseif canImport(Glibc)
+private import Glibc
 #endif
 
 extension Terminal {
@@ -26,10 +26,10 @@ extension Terminal {
 
     public static func size(for fileDescriptor: FileDescriptor) throws(Errno) -> Size {
         var size = winsize()
-        let result = unsafe ioctl(fileDescriptor.rawValue, TIOCGWINSZ, &size)
+        let result = unsafe ioctl(fileDescriptor.rawValue, .init(TIOCGWINSZ), &size)
         guard result == 0
         else {
-            throw .init(rawValue: result)
+            throw .init(rawValue: errno)
         }
         return .init(columns: .init(size.ws_col), rows: .init(size.ws_row))
     }
