@@ -1,6 +1,6 @@
 extension Terminal.SGR {
 
-    public protocol Color: Equatable, Sendable, Hashable, ~Copyable, ~Escapable {
+    public protocol Color: Equatable, Sendable, Hashable {
 
         var background: String {
             get
