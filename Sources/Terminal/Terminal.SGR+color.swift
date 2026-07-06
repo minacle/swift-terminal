@@ -1,6 +1,6 @@
 extension Terminal.SGR {
 
-    public protocol Color: Equatable, Sendable {
+    public protocol Color: Equatable, Sendable, Hashable, ~Copyable, ~Escapable {
 
         var background: String {
             get
@@ -166,5 +166,104 @@ extension Terminal.SGR {
         public var foreground: String {
             return "38;2;\(red);\(green);\(blue)"
         }
+    }
+
+    public struct AnyColor: Color {
+
+        private let box: any _AnyColorBox
+
+        public init<C>(_ color: C)
+        where C: Color {
+            self.box = _ConcreteColorBox(color: color)
+        }
+
+        // MARK: Color
+
+        public var background: String {
+            return box.background
+        }
+
+        public var foreground: String {
+            return box.foreground
+        }
+
+        // MARK: Equatable
+
+        public static func == (lhs: AnyColor, rhs: AnyColor) -> Bool {
+            return lhs.box.isEqual(to: rhs.box)
+        }
+
+        // MARK: Hashable
+
+        public func hash(into hasher: inout Hasher) {
+            box.hash(into: &hasher)
+        }
+    }
+}
+
+// MARK: -
+
+private protocol _AnyColorBox: Sendable {
+
+    var base: Any {
+        get
+    }
+
+    // MARK: (Color)
+
+    var background: String {
+        get
+    }
+
+    var foreground: String {
+        get
+    }
+
+    // MARK: (Equatable)
+
+    func isEqual(to other: any _AnyColorBox) -> Bool
+
+    // MARK: (Hashable)
+
+    func hash(into hasher: inout Hasher)
+}
+
+private struct _ConcreteColorBox<C>: _AnyColorBox
+where C: Terminal.SGR.Color {
+
+    fileprivate var base: Any {
+        return color
+    }
+
+    private let color: C
+
+    fileprivate init(color: C) {
+        self.color = color
+    }
+
+    // MARK: Color
+
+    fileprivate var background: String {
+        return color.background
+    }
+
+    fileprivate var foreground: String {
+        return color.foreground
+    }
+
+    // MARK: Equatable
+
+    fileprivate func isEqual(to other: any _AnyColorBox) -> Bool {
+        guard let other = other as? _ConcreteColorBox<C>
+        else {
+            return false
+        }
+        return self.color == other.color
+    }
+
+    // MARK: Hashable
+
+    fileprivate func hash(into hasher: inout Hasher) {
+        color.hash(into: &hasher)
     }
 }
