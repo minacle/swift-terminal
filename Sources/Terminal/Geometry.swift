@@ -39,6 +39,10 @@ extension Point {
 
     /// The point at column `0`, row `0`.
     public static let zero: Point = .init(column: 0, row: 0)
+
+    public init() {
+        self = .zero
+    }
 }
 
 // MARK: -
@@ -84,6 +88,10 @@ extension Size {
 
     /// A size with `0` columns and `0` rows.
     public static let zero: Size = .init(columns: 0, rows: 0)
+
+    public init() {
+        self = .zero
+    }
 }
 
 // MARK: -
@@ -126,4 +134,8 @@ extension Rect {
 
     /// A rectangle with zero origin and zero size.
     public static let zero: Rect = .init(origin: .zero, size: .zero)
+
+    public init() {
+        self = .zero
+    }
 }
