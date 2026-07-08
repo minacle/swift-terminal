@@ -1,7 +1,17 @@
+/// A type-erased SGR color.
+///
+/// Use `AnyColor` when an API needs to store or compare colors without
+/// preserving the concrete color type. Equality and hashing preserve the
+/// concrete type, so two colors are equal only when they wrap the same color
+/// type and value.
+@frozen
 public struct AnyColor: Terminal.SGR.Color {
 
     private let box: any _AnyColorBox
 
+    /// Creates a type-erased color from a concrete SGR color.
+    ///
+    /// - Parameter color: The concrete color value to wrap.
     public init<C>(_ color: C)
     where C: Terminal.SGR.Color {
         self.box = _ConcreteColorBox(color: color)
@@ -30,38 +40,60 @@ public struct AnyColor: Terminal.SGR.Color {
     }
 }
 
+/// The standard 16 ANSI terminal colors.
+///
+/// These colors map to the conventional 8 base colors and 8 bright colors used
+/// by SGR foreground and background parameters. The actual RGB values are
+/// terminal-theme dependent.
+@frozen
 public enum Color16: CaseIterable, Terminal.SGR.Color {
 
+    /// The standard black color.
     case black
 
+    /// The standard red color.
     case red
 
+    /// The standard green color.
     case green
 
+    /// The standard yellow color.
     case yellow
 
+    /// The standard blue color.
     case blue
 
+    /// The standard magenta color.
     case magenta
 
+    /// The standard cyan color.
     case cyan
 
+    /// The standard white color.
     case white
 
+    /// The bright black color, commonly rendered as gray.
     case brightBlack
 
+    /// The bright red color.
     case brightRed
 
+    /// The bright green color.
     case brightGreen
 
+    /// The bright yellow color.
     case brightYellow
 
+    /// The bright blue color.
     case brightBlue
 
+    /// The bright magenta color.
     case brightMagenta
 
+    /// The bright cyan color.
     case brightCyan
 
+    /// The bright white color.
     case brightWhite
 
     // MARK: Terminal.SGR.Color
@@ -141,12 +173,25 @@ public enum Color16: CaseIterable, Terminal.SGR.Color {
     }
 }
 
+/// An indexed color from the 256-color terminal palette.
+///
+/// Values `0...15` correspond to the standard 16 ANSI colors. Values `16...231`
+/// conventionally address the 6x6x6 color cube, and values `232...255`
+/// conventionally address the grayscale ramp.
+@frozen
 public struct Color256: RawRepresentable, Terminal.SGR.Color {
 
+    /// Creates an indexed color from its 8-bit palette index.
+    ///
+    /// - Parameter rawValue: The terminal palette index.
     public init(_ rawValue: UInt8) {
         self.rawValue = rawValue
     }
 
+    /// Creates an indexed color matching a standard 16-color value.
+    ///
+    /// - Parameter color16: The standard ANSI color to represent in the
+    ///   256-color palette.
     public init(_ color16: Color16) {
         self.rawValue = .init(Color16.allCases.firstIndex(of: color16)!)
     }
@@ -170,14 +215,29 @@ public struct Color256: RawRepresentable, Terminal.SGR.Color {
     }
 }
 
+/// A 24-bit RGB terminal color.
+///
+/// True-color SGR parameters encode the red, green, and blue components
+/// directly. Terminals that do not support 24-bit color may approximate or
+/// ignore these values.
+@frozen
 public struct TrueColor: Terminal.SGR.Color {
 
+    /// The red component.
     public var red: UInt8
 
+    /// The green component.
     public var green: UInt8
 
+    /// The blue component.
     public var blue: UInt8
 
+    /// Creates a 24-bit RGB terminal color.
+    ///
+    /// - Parameters:
+    ///   - red: The red component.
+    ///   - green: The green component.
+    ///   - blue: The blue component.
     public init(red: UInt8, green: UInt8, blue: UInt8) {
         self.red = red
         self.green = green
@@ -197,7 +257,8 @@ public struct TrueColor: Terminal.SGR.Color {
 
 // MARK: -
 
-private protocol _AnyColorBox: Sendable {
+@usableFromInline
+internal protocol _AnyColorBox: Sendable {
 
     var base: Any {
         get
@@ -222,22 +283,27 @@ private protocol _AnyColorBox: Sendable {
     }
 }
 
-private struct _ConcreteColorBox<C>: _AnyColorBox
+@usableFromInline
+internal struct _ConcreteColorBox<C>: _AnyColorBox
 where C: Terminal.SGR.Color {
-
-    fileprivate var base: Any {
-        return color
-    }
 
     private let color: C
 
-    fileprivate init(color: C) {
+    internal init(color: C) {
         self.color = color
+    }
+
+    // MARK: _AnyColorBox
+
+    @usableFromInline
+    internal var base: Any {
+        return color
     }
 
     // MARK: Equatable
 
-    fileprivate func isEqual(to other: any _AnyColorBox) -> Bool {
+    @usableFromInline
+    internal func isEqual(to other: any _AnyColorBox) -> Bool {
         guard let other = other as? _ConcreteColorBox<C>
         else {
             return false
@@ -247,17 +313,20 @@ where C: Terminal.SGR.Color {
 
     // MARK: Hashable
 
-    fileprivate func hash(into hasher: inout Hasher) {
+    @usableFromInline
+    internal func hash(into hasher: inout Hasher) {
         color.hash(into: &hasher)
     }
 
     // MARK: Terminal.SGR.Color
 
-    fileprivate var background: String {
+    @usableFromInline
+    internal var background: String {
         return color.background
     }
 
-    fileprivate var foreground: String {
+    @usableFromInline
+    internal var foreground: String {
         return color.foreground
     }
 }
