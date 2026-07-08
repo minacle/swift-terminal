@@ -98,6 +98,11 @@ func testAnyColor() {
     #expect(trueColor.background == "48;2;12;34;56")
     #expect(trueColor == AnyColor(TrueColor(red: 12, green: 34, blue: 56)))
     #expect(trueColor.hashValue == AnyColor(TrueColor(red: 12, green: 34, blue: 56)).hashValue)
+
+    #expect(color16.base as? Color16 == .red)
+    #expect(color16.base as? Color256 == nil)
+    #expect(color256.base as? Color256 == Color256(42))
+    #expect(trueColor.base as? TrueColor == TrueColor(red: 12, green: 34, blue: 56))
 }
 
 @Test

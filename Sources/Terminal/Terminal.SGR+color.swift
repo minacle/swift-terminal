@@ -7,7 +7,7 @@ extension Terminal.SGR {
     /// `Terminal.SGR.foregroundColor(_:)` or
     /// `Terminal.SGR.backgroundColor(_:)` to wrap those parameters in a
     /// complete escape sequence.
-    public protocol Color: Equatable, Sendable, Hashable {
+    public protocol Color: Equatable, Hashable, Sendable {
 
         /// The SGR parameter that applies the color as a background.
         ///

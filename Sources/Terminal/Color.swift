@@ -17,6 +17,11 @@ public struct AnyColor: Terminal.SGR.Color {
         self.box = _ConcreteColorBox(color: color)
     }
 
+    /// The value wrapped by this instance.
+    public var base: Any {
+        box.base
+    }
+
     // MARK: Equatable
 
     public static func == (lhs: AnyColor, rhs: AnyColor) -> Bool {
@@ -46,7 +51,7 @@ public struct AnyColor: Terminal.SGR.Color {
 /// by SGR foreground and background parameters. The actual RGB values are
 /// terminal-theme dependent.
 @frozen
-public enum Color16: CaseIterable, Terminal.SGR.Color {
+public enum Color16: CaseIterable, Codable, Terminal.SGR.Color {
 
     /// The standard black color.
     case black
@@ -95,6 +100,56 @@ public enum Color16: CaseIterable, Terminal.SGR.Color {
 
     /// The bright white color.
     case brightWhite
+
+    fileprivate var rawValue: UInt8 {
+        switch self {
+        case .black:
+            0
+        case .red:
+            1
+        case .green:
+            2
+        case .yellow:
+            3
+        case .blue:
+            4
+        case .magenta:
+            5
+        case .cyan:
+            6
+        case .white:
+            7
+        case .brightBlack:
+            8
+        case .brightRed:
+            9
+        case .brightGreen:
+            10
+        case .brightYellow:
+            11
+        case .brightBlue:
+            12
+        case .brightMagenta:
+            13
+        case .brightCyan:
+            14
+        case .brightWhite:
+            15
+        }
+    }
+
+    // MARK: Codable
+
+    public init(from decoder: any Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        let rawValue = try container.decode(UInt8.self)
+        self = Color16.allCases.first(where: {$0.rawValue == rawValue % 16})!
+    }
+
+    public func encode(to encoder: any Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(rawValue)
+    }
 
     // MARK: Terminal.SGR.Color
 
@@ -179,7 +234,7 @@ public enum Color16: CaseIterable, Terminal.SGR.Color {
 /// conventionally address the 6x6x6 color cube, and values `232...255`
 /// conventionally address the grayscale ramp.
 @frozen
-public struct Color256: RawRepresentable, Terminal.SGR.Color {
+public struct Color256: Codable, RawRepresentable, Terminal.SGR.Color {
 
     /// Creates an indexed color from its 8-bit palette index.
     ///
@@ -193,7 +248,20 @@ public struct Color256: RawRepresentable, Terminal.SGR.Color {
     /// - Parameter color16: The standard ANSI color to represent in the
     ///   256-color palette.
     public init(_ color16: Color16) {
-        self.rawValue = .init(Color16.allCases.firstIndex(of: color16)!)
+        self.rawValue = .init(color16.rawValue)
+    }
+
+    // MARK: Codable
+
+    public init(from decoder: any Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        let rawValue = try container.decode(UInt8.self)
+        self.rawValue = rawValue
+    }
+
+    public func encode(to encoder: any Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(rawValue)
     }
 
     // MARK: RawRepresentable
@@ -221,7 +289,7 @@ public struct Color256: RawRepresentable, Terminal.SGR.Color {
 /// directly. Terminals that do not support 24-bit color may approximate or
 /// ignore these values.
 @frozen
-public struct TrueColor: Terminal.SGR.Color {
+public struct TrueColor: Codable, Terminal.SGR.Color {
 
     /// The red component.
     public var red: UInt8
@@ -242,6 +310,22 @@ public struct TrueColor: Terminal.SGR.Color {
         self.red = red
         self.green = green
         self.blue = blue
+    }
+
+    // MARK: Codable
+
+    public init(from decoder: any Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        let rawValue = try container.decode(Int32.self)
+        self.red = UInt8((rawValue >> 16) & 0xFF)
+        self.green = UInt8((rawValue >> 8) & 0xFF)
+        self.blue = UInt8(rawValue & 0xFF)
+    }
+
+    public func encode(to encoder: any Encoder) throws {
+        var container = encoder.singleValueContainer()
+        let rawValue = (Int32(red) << 16) | (Int32(green) << 8) | Int32(blue)
+        try container.encode(rawValue)
     }
 
     // MARK: Terminal.SGR.Color
@@ -300,7 +384,7 @@ where C: Terminal.SGR.Color {
         color
     }
 
-    // MARK: Equatable
+    // MARK: (Equatable)
 
     @usableFromInline
     internal func isEqual(to other: any _AnyColorBox) -> Bool {
@@ -311,14 +395,14 @@ where C: Terminal.SGR.Color {
         return self.color == other.color
     }
 
-    // MARK: Hashable
+    // MARK: (Hashable)
 
     @usableFromInline
     internal func hash(into hasher: inout Hasher) {
         color.hash(into: &hasher)
     }
 
-    // MARK: Terminal.SGR.Color
+    // MARK: (Terminal.SGR.Color)
 
     @usableFromInline
     internal var background: String {
