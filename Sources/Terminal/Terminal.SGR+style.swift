@@ -61,3 +61,14 @@ extension Terminal.SGR {
         }
     }
 }
+
+extension Terminal.SGR {
+
+    public static func style(_ style: Style) -> String {
+        return "\u{1B}[\(style.on)m"
+    }
+
+    public static func resetStyle(_ style: Style) -> String {
+        return "\u{1B}[\(style.off)m"
+    }
+}
