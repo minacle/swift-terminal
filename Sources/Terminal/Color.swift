@@ -20,7 +20,7 @@ public struct AnyColor: Terminal.SGR.Color {
     // MARK: Equatable
 
     public static func == (lhs: AnyColor, rhs: AnyColor) -> Bool {
-        return lhs.box.isEqual(to: rhs.box)
+        lhs.box.isEqual(to: rhs.box)
     }
 
     // MARK: Hashable
@@ -32,11 +32,11 @@ public struct AnyColor: Terminal.SGR.Color {
     // MARK: Terminal.SGR.Color
 
     public var background: String {
-        return box.background
+        box.background
     }
 
     public var foreground: String {
-        return box.foreground
+        box.foreground
     }
 }
 
@@ -101,74 +101,74 @@ public enum Color16: CaseIterable, Terminal.SGR.Color {
     public var background: String {
         switch self {
         case .black:
-            return "40"
+            "40"
         case .red:
-            return "41"
+            "41"
         case .green:
-            return "42"
+            "42"
         case .yellow:
-            return "43"
+            "43"
         case .blue:
-            return "44"
+            "44"
         case .magenta:
-            return "45"
+            "45"
         case .cyan:
-            return "46"
+            "46"
         case .white:
-            return "47"
+            "47"
         case .brightBlack:
-            return "100"
+            "100"
         case .brightRed:
-            return "101"
+            "101"
         case .brightGreen:
-            return "102"
+            "102"
         case .brightYellow:
-            return "103"
+            "103"
         case .brightBlue:
-            return "104"
+            "104"
         case .brightMagenta:
-            return "105"
+            "105"
         case .brightCyan:
-            return "106"
+            "106"
         case .brightWhite:
-            return "107"
+            "107"
         }
     }
 
     public var foreground: String {
         switch self {
         case .black:
-            return "30"
+            "30"
         case .red:
-            return "31"
+            "31"
         case .green:
-            return "32"
+            "32"
         case .yellow:
-            return "33"
+            "33"
         case .blue:
-            return "34"
+            "34"
         case .magenta:
-            return "35"
+            "35"
         case .cyan:
-            return "36"
+            "36"
         case .white:
-            return "37"
+            "37"
         case .brightBlack:
-            return "90"
+            "90"
         case .brightRed:
-            return "91"
+            "91"
         case .brightGreen:
-            return "92"
+            "92"
         case .brightYellow:
-            return "93"
+            "93"
         case .brightBlue:
-            return "94"
+            "94"
         case .brightMagenta:
-            return "95"
+            "95"
         case .brightCyan:
-            return "96"
+            "96"
         case .brightWhite:
-            return "97"
+            "97"
         }
     }
 }
@@ -207,11 +207,11 @@ public struct Color256: RawRepresentable, Terminal.SGR.Color {
     // MARK: Terminal.SGR.Color
 
     public var background: String {
-        return "48;5;\(rawValue)"
+        "48;5;\(rawValue)"
     }
 
     public var foreground: String {
-        return "38;5;\(rawValue)"
+        "38;5;\(rawValue)"
     }
 }
 
@@ -247,11 +247,11 @@ public struct TrueColor: Terminal.SGR.Color {
     // MARK: Terminal.SGR.Color
 
     public var background: String {
-        return "48;2;\(red);\(green);\(blue)"
+        "48;2;\(red);\(green);\(blue)"
     }
 
     public var foreground: String {
-        return "38;2;\(red);\(green);\(blue)"
+        "38;2;\(red);\(green);\(blue)"
     }
 }
 
@@ -297,7 +297,7 @@ where C: Terminal.SGR.Color {
 
     @usableFromInline
     internal var base: Any {
-        return color
+        color
     }
 
     // MARK: Equatable
@@ -322,11 +322,11 @@ where C: Terminal.SGR.Color {
 
     @usableFromInline
     internal var background: String {
-        return color.background
+        color.background
     }
 
     @usableFromInline
     internal var foreground: String {
-        return color.foreground
+        color.foreground
     }
 }

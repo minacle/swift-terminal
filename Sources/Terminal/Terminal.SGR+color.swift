@@ -30,7 +30,7 @@ extension Terminal.SGR {
     /// - Returns: A complete SGR escape sequence, including the escape prefix
     ///   and final `m`.
     public static func backgroundColor(_ color: any Color) -> String {
-        return "\u{1B}[\(color.background)m"
+        "\u{1B}[\(color.background)m"
     }
 
     /// Returns an escape sequence that applies a foreground color.
@@ -39,18 +39,18 @@ extension Terminal.SGR {
     /// - Returns: A complete SGR escape sequence, including the escape prefix
     ///   and final `m`.
     public static func foregroundColor(_ color: any Color) -> String {
-        return "\u{1B}[\(color.foreground)m"
+        "\u{1B}[\(color.foreground)m"
     }
 
     /// An escape sequence that resets the background color to the terminal
     /// default.
     public static var resetBackgroundColor: String {
-        return "\u{1B}[49m"
+        "\u{1B}[49m"
     }
 
     /// An escape sequence that resets the foreground color to the terminal
     /// default.
     public static var resetForegroundColor: String {
-        return "\u{1B}[39m"
+        "\u{1B}[39m"
     }
 }
